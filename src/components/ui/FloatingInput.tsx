@@ -53,7 +53,7 @@ export const FloatingInput: React.FC<FloatingInputProps> = ({
         animate={{
           y: isActive ? (isTextArea ? -24 : -24) : (isTextArea ? 10 : 8),
           scale: isActive ? 0.8 : 1,
-          color: isFocused ? '#66FCF1' : (isValid === false ? '#ef4444' : '#C5C6C7'),
+          color: isFocused ? '#3B82F6' : (isValid === false ? '#ef4444' : '#F1F5F9'),
         }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         className="absolute left-0 top-2 origin-top-left pointer-events-none"

@@ -7,14 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B0C10',
+        background: '#050505',
         card: 'rgba(255, 255, 255, 0.05)',
-        surface: '#1F2833',
+        surface: '#0A192F',
         primary: {
-          DEFAULT: '#66FCF1',
-          dark: '#45A29E',
+          DEFAULT: '#3B82F6',
+          dark: '#1D4ED8',
         },
-        secondary: '#C5C6C7',
+        secondary: '#F1F5F9',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

@@ -18,7 +18,7 @@ export const RiderConfig = () => {
       {/* Abstract particle background simulation using CSS radial gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[20%] left-[20%] w-[50vw] h-[50vw] bg-primary/10 rounded-full blur-[100px] mix-blend-screen animate-blob" />
-        <div className="absolute top-[40%] right-[20%] w-[40vw] h-[40vw] bg-[#45A29E]/10 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[40%] right-[20%] w-[40vw] h-[40vw] bg-[#1D4ED8]/10 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="w-full max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center z-10">
@@ -79,7 +79,7 @@ export const RiderConfig = () => {
           >
             <MagneticButton 
               onClick={() => navigate('/garage')} 
-              className={riderCount > 0 ? "border-[#66FCF1] shadow-[0_0_15px_rgba(102,252,241,0.2)]" : "opacity-50 pointer-events-none"}
+              className={riderCount > 0 ? "border-[#3B82F6] shadow-[0_0_15px_rgba(102,252,241,0.2)]" : "opacity-50 pointer-events-none"}
             >
               Continue to Garage
             </MagneticButton>
@@ -104,8 +104,8 @@ export const RiderConfig = () => {
                   transition={{ type: "spring", stiffness: 200, damping: 20 }}
                   className="flex flex-col items-center justify-center"
                 >
-                  <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(102,252,241,0.2)] ${i === 0 ? 'bg-primary/20 border-2 border-primary' : 'bg-[#45A29E]/20 border-2 border-[#45A29E]'}`}>
-                    <User className={`w-16 h-16 ${i === 0 ? 'text-primary' : 'text-[#45A29E]'}`} />
+                  <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(102,252,241,0.2)] ${i === 0 ? 'bg-primary/20 border-2 border-primary' : 'bg-[#1D4ED8]/20 border-2 border-[#1D4ED8]'}`}>
+                    <User className={`w-16 h-16 ${i === 0 ? 'text-primary' : 'text-[#1D4ED8]'}`} />
                   </div>
                   <span className="text-secondary font-medium tracking-wide uppercase text-sm">
                     {i === 0 ? "Primary Rider" : "Pillion / Co-Rider"}

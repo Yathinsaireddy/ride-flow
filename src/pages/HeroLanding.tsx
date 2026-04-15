@@ -40,7 +40,9 @@ export const HeroLanding = () => {
             transition={{ duration: 0.8, delay: 1 }}
             className="text-5xl md:text-6xl font-black mb-4 tracking-tighter text-white drop-shadow-lg"
           >
-            BOOK <span className="text-gradient">NOW</span>
+            <span className="text-[#3B82F6]">RIDE</span>
+            <span className="text-white px-1">-</span>
+            <span className="text-gradient">FLOW</span>
           </motion.h1>
           
           <motion.p 
@@ -63,8 +65,8 @@ export const HeroLanding = () => {
           transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-10 animate-bounce flex flex-col items-center opacity-70 pointer-events-none"
         >
-          <span className="text-sm font-medium tracking-widest text-[#C5C6C7] mb-2 uppercase">Scroll down</span>
-          <ChevronDown className="w-6 h-6 text-[#66FCF1]" />
+          <span className="text-sm font-medium tracking-widest text-[#F1F5F9] mb-2 uppercase">Scroll down</span>
+          <ChevronDown className="w-6 h-6 text-[#3B82F6]" />
         </motion.div>
       </div>
     </PageWrapper>

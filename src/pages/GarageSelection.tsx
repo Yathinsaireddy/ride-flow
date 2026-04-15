@@ -28,7 +28,7 @@ const WireframeBikeBackground = () => {
         <ambientLight intensity={1} />
         <mesh rotation={[0.4, 0.5, 0]} scale={2.5} position={[0, -1, 0]}>
           <torusKnotGeometry args={[1, 0.3, 100, 16]} />
-          <meshBasicMaterial color="#66FCF1" wireframe />
+          <meshBasicMaterial color="#3B82F6" wireframe />
         </mesh>
       </Canvas>
     </div>
