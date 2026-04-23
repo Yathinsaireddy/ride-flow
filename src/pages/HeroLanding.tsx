@@ -18,7 +18,7 @@ const Logo = () => (
 );
 
 // ─── Full-Screen Menu Overlay ─────────────────────────────────────────────────
-const navItems = ['Home', 'About Us', 'Our Mission'];
+const navItems = ['Home', 'About Us', 'Our Mission', 'My Bookings'];
 
 const MenuOverlay = ({ open, onClose, onBook }: { open: boolean; onClose: () => void; onBook: () => void }) => (
   <AnimatePresence>
@@ -48,7 +48,7 @@ const MenuOverlay = ({ open, onClose, onBook }: { open: boolean; onClose: () => 
           {navItems.map((item, i) => (
             <motion.a
               key={item}
-              href={`#${item.toLowerCase().replace(/ /g, '-')}`}
+              href={item === 'My Bookings' ? '/history' : `#${item.toLowerCase().replace(/ /g, '-')}`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.07 }}
@@ -382,6 +382,7 @@ export const HeroLanding = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleBook = () => navigate('/booking');
+  const handleHistory = () => navigate('/history');
 
   // Lock scroll when menu open
   useEffect(() => {

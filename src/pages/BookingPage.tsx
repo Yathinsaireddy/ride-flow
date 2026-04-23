@@ -5,6 +5,8 @@ import { ArrowLeft } from 'lucide-react';
 import { BikeSelectStep } from './booking/BikeSelectStep';
 import { LocationStep } from './booking/LocationStep';
 import { ConfirmStep } from './booking/ConfirmStep';
+import { RiderDetailsStep } from './booking/RiderDetailsStep';
+import { EVTransitionAnimation } from './booking/EVTransitionAnimation';
 
 export interface BookingData {
   bikeId: number | null;
@@ -17,6 +19,9 @@ export interface BookingData {
   distanceKm: number;
   date: string;
   time: string;
+  riderName?: string;
+  riderPhone?: string;
+  riderEmail?: string;
 }
 
 const Logo = () => (
@@ -29,11 +34,12 @@ const Logo = () => (
   </div>
 );
 
-const STEPS = ['Choose Ride', 'Route', 'Confirm'];
+const STEPS = ['Choose Ride', 'Route', 'Confirm', 'Details'];
 
 export const BookingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [showEVAnimation, setShowEVAnimation] = useState(false);
   const [data, setData] = useState<BookingData>({
     bikeId: null, bikeName: '', bikeRate: 0,
     pickup: '', pickupCoords: null,
@@ -49,7 +55,11 @@ export const BookingPage = () => {
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-[#1A1A1A]">
         <button
-          onClick={() => step === 0 ? navigate('/') : setStep(s => s - 1)}
+          onClick={() => {
+            if (showEVAnimation) return;
+            if (step === 0) navigate('/');
+            else setStep(s => s - 1);
+          }}
           className="flex items-center gap-2 text-tertiary hover:text-primary transition-colors text-sm uppercase tracking-widest font-sans"
         >
           <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
@@ -70,19 +80,38 @@ export const BookingPage = () => {
 
       {/* Step content */}
       <AnimatePresence mode="wait">
-        {step === 0 && (
+        {step === 0 && !showEVAnimation && (
           <motion.div key="step0" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
-            <BikeSelectStep onSelect={(bike) => { update(bike); setStep(1); }} />
+            <BikeSelectStep onSelect={(bike) => { 
+              update(bike); 
+              if ((bike as any).isEv) {
+                setShowEVAnimation(true);
+              } else {
+                setStep(1); 
+              }
+            }} />
           </motion.div>
         )}
-        {step === 1 && (
+        
+        {showEVAnimation && (
+          <motion.div key="ev-anim" className="fixed inset-0 z-50">
+            <EVTransitionAnimation onComplete={() => { setShowEVAnimation(false); setStep(1); }} />
+          </motion.div>
+        )}
+
+        {step === 1 && !showEVAnimation && (
           <motion.div key="step1" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
             <LocationStep data={data} onUpdate={update} onNext={() => setStep(2)} />
           </motion.div>
         )}
         {step === 2 && (
           <motion.div key="step2" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
-            <ConfirmStep data={data} onUpdate={update} onDone={() => navigate('/')} />
+            <ConfirmStep data={data} onUpdate={update} onNext={() => setStep(3)} />
+          </motion.div>
+        )}
+        {step === 3 && (
+          <motion.div key="step3" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
+            <RiderDetailsStep data={data} onUpdate={update} />
           </motion.div>
         )}
       </AnimatePresence>

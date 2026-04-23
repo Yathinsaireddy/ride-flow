@@ -41,6 +41,10 @@ interface Props { data: BookingData; onUpdate: (p: Partial<BookingData>) => void
 export const LocationStep: React.FC<Props> = ({ data, onUpdate, onNext }) => {
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState('');
+  const [pickupQuery, setPickupQuery] = useState(data.pickup || '');
+  const [pickupResults, setPickupResults] = useState<SearchResult[]>([]);
+  const [searchingPickup, setSearchingPickup] = useState(false);
+  const pickupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [dropQuery, setDropQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -64,13 +68,37 @@ export const LocationStep: React.FC<Props> = ({ data, onUpdate, onNext }) => {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
         const json = await res.json();
         const addr = json.display_name?.split(',').slice(0, 3).join(', ') || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        onUpdate({ pickup: addr, pickupCoords: [lat, lng] });
+        setPickupQuery(addr);
+        const dist = data.dropoffCoords ? haversine([lat, lng], data.dropoffCoords) : 0;
+        onUpdate({ pickup: addr, pickupCoords: [lat, lng], distanceKm: dist });
         mapRef.current?.flyTo([lat, lng], 14);
         setLocating(false);
       },
       (err) => { setLocError('Location access denied. Please search manually.'); setLocating(false); },
       { enableHighAccuracy: true }
     );
+  };
+
+  const searchPickup = (q: string) => {
+    setPickupQuery(q);
+    if (pickupTimerRef.current) clearTimeout(pickupTimerRef.current);
+    if (!q.trim()) { setPickupResults([]); return; }
+    pickupTimerRef.current = setTimeout(async () => {
+      setSearchingPickup(true);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&countrycodes=in`);
+      setPickupResults(await res.json());
+      setSearchingPickup(false);
+    }, 500);
+  };
+
+  const selectPickup = (r: SearchResult) => {
+    const coords: [number, number] = [parseFloat(r.lat), parseFloat(r.lon)];
+    const addr = r.display_name.split(',').slice(0, 3).join(', ');
+    const dist = data.dropoffCoords ? haversine(coords, data.dropoffCoords) : 0;
+    onUpdate({ pickup: addr, pickupCoords: coords, distanceKm: dist });
+    setPickupQuery(addr);
+    setPickupResults([]);
+    mapRef.current?.flyTo(coords, 14);
   };
 
   const searchDrop = (q: string) => {
@@ -94,6 +122,8 @@ export const LocationStep: React.FC<Props> = ({ data, onUpdate, onNext }) => {
     setResults([]);
     if (data.pickupCoords) {
       mapRef.current?.fitBounds([data.pickupCoords, coords], { padding: [50, 50] });
+    } else {
+      mapRef.current?.flyTo(coords, 14);
     }
   };
 
@@ -125,31 +155,50 @@ export const LocationStep: React.FC<Props> = ({ data, onUpdate, onNext }) => {
         <h2 className="font-brand font-bold text-2xl text-secondary mb-1">Route Details</h2>
         <p className="text-tertiary text-xs font-sans mb-8">Set your pickup and drop-off points.</p>
 
-        {/* Pickup (GPS) */}
+        {/* Pickup */}
         <div className="mb-5">
-          <p className="text-[9px] text-tertiary uppercase tracking-[0.25em] font-sans mb-2">📍 Pick Up (GPS)</p>
-          <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 flex items-start gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary mt-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              {locating ? (
-                <div className="flex items-center gap-2 text-tertiary text-xs font-sans">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Detecting your location...
-                </div>
-              ) : locError ? (
-                <div>
-                  <p className="text-[#FF4B4B] text-xs font-sans">{locError}</p>
-                  <button onClick={fetchGPS} className="text-primary text-xs font-brand mt-1 hover:underline">Retry GPS</button>
-                </div>
-              ) : data.pickup ? (
-                <p className="text-secondary text-xs font-sans truncate">{data.pickup}</p>
-              ) : (
-                <p className="text-tertiary text-xs font-sans italic">Fetching location...</p>
-              )}
-            </div>
-            <button onClick={fetchGPS} className="text-tertiary hover:text-primary transition-colors shrink-0" title="Refresh GPS">
-              <Navigation className="w-4 h-4" strokeWidth={1.5} />
-            </button>
+          <p className="text-[9px] text-tertiary uppercase tracking-[0.25em] font-sans mb-2">📍 Pick Up</p>
+          <div className="relative mb-1">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary" />
+            <input
+              type="text"
+              placeholder="Search pickup location..."
+              value={pickupQuery}
+              onChange={(e) => searchPickup(e.target.value)}
+              disabled={locating}
+              className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl py-3 pl-9 pr-10 text-secondary text-sm font-sans outline-none focus:border-primary transition-colors duration-200 placeholder:text-[#555]"
+            />
+            {locating || searchingPickup ? (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-tertiary" />
+            ) : (
+              <button onClick={fetchGPS} className="absolute right-3 top-1/2 -translate-y-1/2 text-tertiary hover:text-primary transition-colors" title="Use GPS">
+                <Navigation className="w-4 h-4" strokeWidth={1.5} />
+              </button>
+            )}
           </div>
+          {locError && <p className="text-[#FF4B4B] text-[10px] font-sans px-1 mt-1">{locError}</p>}
+          
+          <AnimatePresence>
+            {pickupResults.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl overflow-hidden mt-2"
+              >
+                {pickupResults.map((r) => (
+                  <button
+                    key={r.place_id}
+                    onClick={() => selectPickup(r)}
+                    className="w-full text-left px-4 py-3 hover:bg-[#222] transition-colors flex items-center gap-3 border-b border-[#222] last:border-0"
+                  >
+                    <Search className="w-3.5 h-3.5 text-tertiary shrink-0" strokeWidth={1.5} />
+                    <span className="text-secondary text-xs font-sans line-clamp-1">{r.display_name}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Dropoff search */}
