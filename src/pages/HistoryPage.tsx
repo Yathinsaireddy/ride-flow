@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, MapPin, Zap, Bike } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Zap, Bike, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/useBookingStore';
 
@@ -66,6 +66,7 @@ const PirateETACard = ({ distanceKm }: { distanceKm: number }) => {
 export const HistoryPage = () => {
   const navigate = useNavigate();
   const bookings = useBookingStore(state => state.bookings);
+  const clearBookings = useBookingStore(state => state.clearBookings);
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">
@@ -85,7 +86,18 @@ export const HistoryPage = () => {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-8 py-14">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <h1 className="font-brand font-bold text-4xl text-secondary mb-2">Booking History.</h1>
+          <div className="flex justify-between items-end mb-2">
+            <h1 className="font-brand font-bold text-4xl text-secondary">Booking History.</h1>
+            {bookings.length > 0 && (
+              <button 
+                onClick={clearBookings}
+                className="text-red-500 hover:text-red-400 text-sm font-sans uppercase tracking-widest transition-colors flex items-center gap-2 mb-1"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All
+              </button>
+            )}
+          </div>
           <p className="text-tertiary text-sm font-sans mb-10">Review your past rides and reservations.</p>
         </motion.div>
 
