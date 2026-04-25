@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown, X, Menu, Zap, Leaf, Clock, ArrowRight, Shield, MapPin } from 'lucide-react';
@@ -382,7 +382,6 @@ export const HeroLanding = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleBook = () => navigate('/booking');
-  const handleHistory = () => navigate('/history');
 
   // Lock scroll when menu open
   useEffect(() => {

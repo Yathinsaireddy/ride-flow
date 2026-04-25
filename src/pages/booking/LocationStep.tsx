@@ -74,7 +74,7 @@ export const LocationStep: React.FC<Props> = ({ data, onUpdate, onNext }) => {
         mapRef.current?.flyTo([lat, lng], 14);
         setLocating(false);
       },
-      (err) => { setLocError('Location access denied. Please search manually.'); setLocating(false); },
+      () => { setLocError('Location access denied. Please search manually.'); setLocating(false); },
       { enableHighAccuracy: true }
     );
   };
